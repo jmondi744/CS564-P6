@@ -19,59 +19,59 @@ const Status QU_Delete(const string & relation,
   // part 6
   
   Status status;
-  if(status != OK) {
-      return status;
-  }
   int count = 0; 
   RID rid;
   
   HeapFileScan relScan(relation, status);
   
   //Null attrName check
-  if(attrName.length() == 0) {
+  if(attrName.length() == 0) {  //not sure about length check
+      //set offset to 0
+      //set length to 0
+      //set type to string
+      //set filter to null
+      status = relScan.startScan(0, 0, STRING, NULL, EQ);    
+  } else {
+      //Check for type
+      const char* holder;
+      int holder2;
+      switch(type) {
+          case STRING:
+              holder = attrValue;
+              break;
       
+          case INTEGER:
+              holder2 = atoi(attrValue);
+              holder = (char*)&(holder2);
+              break;
+        
+          case FLOAT:
+              holder2 = atoi(attrValue);
+              holder = (char*)&(holder2);
+              break;          
+      }
+  
+      AttrDesc desc;
+      status = attrCat->getInfo(relation, attrName, desc);
+      if(status != OK) {
+          return status;
+      }
+      status = relScan.startScan(desc.attrOffset, desc.attrLen, type, holder,op);
   }
   
-  //Check for type
-  char* holder;
-  switch(type) {
-      case STRING
-          holder = attrValue;
-          break;
-      
-      case INTEGER
-          holder = (char*)&(atoi(attrValue));
-          break;
-      
-      case FLOAT
-          holder = (char*)&(atof(attrValue));
-          break;          
-  }
-  
-  AttrDesc desc;
-  status = attrCat->getInfo(relation, attrName, attrDesc);
   if(status != OK) {
       return status;
-  }
-  
-  //Scan for tuples that match
-  status = relScan.startSCan(arrtDesc.attrOffset, attrDesc.attrLen, type, holder,op);
-  if(status != OK) {
-      return status;
-  }
+  } 
   
   while(relScan.scanNext(rid) == OK) {
-      status = relScan.deleteRecodr();
+      status = relScan.deleteRecord();
       if(status != OK) {
-        return status;
+          return status;
       }    
       count++;
   }   
   
   return OK;
-
-
-
 }
 
 
