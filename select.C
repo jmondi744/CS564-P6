@@ -42,52 +42,48 @@ const Status QU_Select(const string & result,
             return status;
         }
     }
-    
-    // get AttrDesc structure for the first join attribute
-    AttrDesc attrDesc;
-    status = attrCat->getInfo(attr->relName,
-                                     attr->attrName,
-                                     attrDesc);
-    if (status != OK)
-    {
-        return status;
-    }
 
+	AttrDesc attrDesc;
+	const char *filter;
+	if(attr != NULL) {
+		status = attrCat->getInfo(attr->relName, attr->attrName, attrDesc);
+		if (status != OK)
+		{
+			return status;
+		}
+
+		int ival;
+		float fval;
+		switch(attr->attrType) {
+			case STRING:
+				filter = attrValue;
+				break;
+
+			case INTEGER:
+				ival = atoi(attrValue);
+				filter = (char*)&(ival);
+				break;
+
+			case FLOAT:
+				fval = atof(attrValue);
+				filter = (char*)&(fval);
+				break;          
+		}
+	} else {
+		attrDesc = attrDescArray[0];
+		char *temp = new char();
+		*temp = NULL;
+		filter = temp;
+	}
 	int reclen = 0;
     for (int i = 0; i < projCnt; i++)
     {
         reclen += attrDescArray[i].attrLen;
     }
 
-	const char *filter;
-	// if(attr->attrType == STRING) {
-	// 	memcpy(filter, attrValue, attr->attrLen);
-	// } else if (attr->attrType == INTEGER) {
-	// 	int val = atoi(attrValue);
-	// 	memcpy(filter, &val, sizeof(int));
-	// } else if (attr->attrType == FLOAT) {
-	// 	float val = atof(attrValue);
-	// 	memcpy(filter, &val, sizeof(float));
-	// }
-	int ival;
-	int fval;
-	switch(attr->attrType) {
-		case STRING:
-			filter = attrValue;
-			break;
+	
 
-		case INTEGER:
-			ival = atoi(attrValue);
-			filter = (char*)&(ival);
-			break;
-
-		case FLOAT:
-			fval = atof(attrValue);
-			filter = (char*)&(fval);
-			break;          
-      }
-
-	cout << "Doing ScanSelect" << endl;
+	//cout << "Doing ScanSelect" << endl;
 	status = ScanSelect(result, projCnt, attrDescArray, &attrDesc, op, filter, reclen);
 	return status;
 
@@ -138,7 +134,7 @@ const Status ScanSelect(const string & result,
 		RID outRID;
 		status = resultRel.insertRecord(outputRec, outRID);
 		ASSERT(status == OK);
-		cout << "added recordqu" << endl; 
+		//cout << "added recordqu" << endl; 
 	}
 	return OK;
 }
