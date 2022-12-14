@@ -35,6 +35,8 @@ const Status QU_Delete(const string & relation,
       //Check for type
       const char* holder;
       int holder2;
+      float holder3;
+      
       switch(type) {
           case STRING:
               holder = attrValue;
@@ -46,8 +48,8 @@ const Status QU_Delete(const string & relation,
               break;
         
           case FLOAT:
-              holder2 = atoi(attrValue);
-              holder = (char*)&(holder2);
+              holder3 = atof(attrValue);
+              holder = (char*)&(holder3);
               break;          
       }
   
