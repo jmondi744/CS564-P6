@@ -42,7 +42,7 @@ const Status QU_Insert(const string & relation,
 					} else if(attrList[i].attrType == FLOAT) {
 						float a = atof((char *) attrList[i].attrValue);
 						memcpy(data + attrs[y].attrOffset, (char *)&a, attrs[y].attrLen);
-					} else if(attrList[i].attrType == FLOAT) {
+					} else if(attrList[i].attrType == STRING) {
 						memcpy(data + attrs[y].attrOffset, (char *) attrList[i].attrValue, attrs[y].attrLen);
 					} else {
 						return ATTRTYPEMISMATCH;
